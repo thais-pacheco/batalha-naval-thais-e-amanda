@@ -23,6 +23,21 @@ public class BatalhaNaval {
         inicializarTabuleiro(tab2);
         inicializarTabuleiro(visivel1);
         inicializarTabuleiro(visivel2);
+
+        System.out.println("=== BATALHA NAVAL ===");
+        System.out.print("Digite o nome do Jogador 1: ");
+        nome1 = scanner.nextLine();
+
+        System.out.print("Deseja jogar contra a máquina? (s/n): ");
+        String escolha = scanner.nextLine().trim().toLowerCase();
+        contraComputador = escolha.equals("s");
+
+        if (contraComputador) {
+            nome2 = "Computador";
+        } else {
+            System.out.print("Digite o nome do Jogador 2: ");
+            nome2 = scanner.nextLine();
+        }
     }
 
     static void inicializarTabuleiro(char[][] tab) {
