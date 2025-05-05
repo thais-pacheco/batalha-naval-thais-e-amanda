@@ -14,6 +14,20 @@ public class BatalhaNaval {
     static boolean contraComputador = false;
 
     public static void main(String[] args) {
-        // Lógica principal será implementada nos próximos commits
+        char[][] tab1 = new char[TAMANHO][TAMANHO];
+        char[][] tab2 = new char[TAMANHO][TAMANHO];
+        char[][] visivel1 = new char[TAMANHO][TAMANHO];
+        char[][] visivel2 = new char[TAMANHO][TAMANHO];
+
+        inicializarTabuleiro(tab1);
+        inicializarTabuleiro(tab2);
+        inicializarTabuleiro(visivel1);
+        inicializarTabuleiro(visivel2);
+    }
+
+    static void inicializarTabuleiro(char[][] tab) {
+        for (int i = 0; i < TAMANHO; i++) {
+            Arrays.fill(tab[i], AGUA);
+        }
     }
 }
