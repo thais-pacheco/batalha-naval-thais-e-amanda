@@ -45,4 +45,35 @@ public class BatalhaNaval {
             Arrays.fill(tab[i], AGUA);
         }
     }
+
+    static void posicionarNavios(char[][] tab) {
+        int[] tamanhos = {5, 4, 3, 3, 2};
+        for (int tamanho : tamanhos) {
+            boolean colocado = false;
+            while (!colocado) {
+                int linha = rand.nextInt(TAMANHO);
+                int coluna = rand.nextInt(TAMANHO);
+                boolean horizontal = rand.nextBoolean();
+
+                if (podeColocar(tab, linha, coluna, tamanho, horizontal)) {
+                    for (int i = 0; i < tamanho; i++) {
+                        int l = linha + (horizontal ? 0 : i);
+                        int c = coluna + (horizontal ? i : 0);
+                        tab[l][c] = NAVIO;
+                    }
+                    colocado = true;
+                }
+            }
+        }
+    }
+
+    static boolean podeColocar(char[][] tab, int l, int c, int tamanho, boolean h) {
+        if ((h && c + tamanho > TAMANHO) || (!h && l + tamanho > TAMANHO)) return false;
+        for (int i = 0; i < tamanho; i++) {
+            int linha = l + (h ? 0 : i);
+            int coluna = c + (h ? i : 0);
+            if (tab[linha][coluna] != AGUA) return false;
+        }
+        return true;
+    }
 }
