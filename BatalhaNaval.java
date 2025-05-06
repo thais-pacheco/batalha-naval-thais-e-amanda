@@ -7,7 +7,6 @@ public class BatalhaNaval {
     static final char TIRO = 'X';
     static final char ERRO = 'O';
 
-
     static Scanner scanner = new Scanner(System.in);
     static Random rand = new Random();
 
@@ -41,36 +40,55 @@ public class BatalhaNaval {
         }
 
         System.out.println("\nPosicionando navios para " + nome1 + "...");
-        posicionarNavios(tab1);
-        System.out.println("Navios posicionados!\n");
+        if (posicionarNavios(tab1)) {
+            System.out.println("Navios posicionados!\n");
+        }
 
         System.out.println("Posicionando navios para " + nome2 + "...");
-        posicionarNavios(tab2);
-        System.out.println("Navios posicionados!\n");
+        if (contraComputador) {
+            posicionarNaviosAutomaticamente(tab2);
+            System.out.println("Navios posicionados!\n");
+        } else {
+            if (posicionarNavios(tab2)) {
+                System.out.println("Navios posicionados!\n");
+            }
+        }
 
         boolean jogoAtivo = true;
 
         while (jogoAtivo) {
             System.out.println("\n===== Vez de " + nome1 + " =====");
             mostrarTabuleiro(visivel1, nome2);
-            turno(tab2, visivel1, nome1);
+            if (turno(tab2, visivel1, nome1)) {
+                System.out.println(nome1 + " acertou e segue jogando!");
+            } else {
+                System.out.println("Fim de turno de " + nome1);
+            }
 
             if (verificarFim(tab2)) {
-                System.out.println("🎉 " + nome1 + " venceu!");
+                System.out.println(nome1 + " venceu!");
                 jogoAtivo = false;
                 continue;
             }
 
             System.out.println("\n===== Vez de " + nome2 + " =====");
             if (contraComputador) {
-                turnoComputador(tab1, visivel2);
+                if (turnoComputador(tab1, visivel2)) {
+                    System.out.println("O computador acertou e segue jogando!");
+                } else {
+                    System.out.println("Fim de turno do computador.");
+                }
             } else {
                 mostrarTabuleiro(visivel2, nome1);
-                turno(tab1, visivel2, nome2);
+                if (turno(tab1, visivel2, nome2)) {
+                    System.out.println(nome2 + " acertou e segue jogando!");
+                } else {
+                    System.out.println("Fim de turno de " + nome2);
+                }
             }
 
             if (verificarFim(tab1)) {
-                System.out.println("🎉 " + nome2 + " venceu!");
+                System.out.println(nome2 + " venceu!");
                 jogoAtivo = false;
             }
         }
@@ -101,8 +119,65 @@ public class BatalhaNaval {
         }
     }
 
-    static void posicionarNavios(char[][] tab) {
-        int[] tamanhos = {5, 4, 3, 3, 2};
+    static boolean posicionarNavios(char[][] tab) {
+        int[] tamanhos = {4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
+        for (int tamanho : tamanhos) {
+            boolean colocado = false;
+            while (!colocado) {
+                System.out.println("Posicionando navio de " + tamanho + " espaços...");
+                int linha = -1, coluna = -1;
+                boolean valido = false;
+
+                while (!valido) {
+                    System.out.print("Digite a posição (ex: A3): ");
+                    String entrada = scanner.next().trim().toUpperCase();
+
+                    if (entrada.length() < 2 || entrada.length() > 3) {
+                        System.out.println("Entrada inválida. Use formato como B7.");
+                        continue;
+                    }
+
+                    char letra = entrada.charAt(0);
+                    if (letra < 'A' || letra > 'J') {
+                        System.out.println("Coluna inválida. Use letras de A a J.");
+                        continue;
+                    }
+                    coluna = letra - 'A';
+
+                    String numStr = entrada.substring(1);
+                    try {
+                        linha = Integer.parseInt(numStr) - 1;
+                        if (linha < 0 || linha >= TAMANHO) {
+                            System.out.println("Linha inválida. Use números de 1 a 10.");
+                            continue;
+                        }
+                        valido = true;
+                    } catch (Exception e) {
+                        System.out.println("Número da linha inválido.");
+                    }
+                }
+
+                System.out.print("Posicionar horizontal (h) ou vertical (v)? ");
+                char orientacao = scanner.next().toLowerCase().charAt(0);
+
+                if (podeColocar(tab, linha, coluna, tamanho, orientacao == 'h')) {
+                    for (int i = 0; i < tamanho; i++) {
+                        int l = linha + (orientacao == 'v' ? i : 0);
+                        int c = coluna + (orientacao == 'h' ? i : 0);
+                        tab[l][c] = NAVIO;
+                    }
+                    colocado = true;
+                    System.out.println("Navio posicionado!");
+                } else {
+                    System.out.println("Posição inválida, tente novamente.");
+                }
+            }
+        }
+        return true;
+    }
+
+    static void posicionarNaviosAutomaticamente(char[][] tab) {
+        int[] tamanhos = {4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
         for (int tamanho : tamanhos) {
             boolean colocado = false;
             while (!colocado) {
@@ -133,7 +208,7 @@ public class BatalhaNaval {
         return true;
     }
 
-    static void turno(char[][] inimigo, char[][] visivel, String jogador) {
+    static boolean turno(char[][] inimigo, char[][] visivel, String jogador) {
         int linha = -1, coluna = -1;
         boolean valido = false;
 
@@ -143,7 +218,7 @@ public class BatalhaNaval {
                 String entrada = scanner.nextLine().trim().toUpperCase();
 
                 if (entrada.length() < 2 || entrada.length() > 3) {
-                    System.out.println(" Entrada inválida. Use formato como B7.");
+                    System.out.println("Entrada inválida. Use formato como B7.");
                     continue;
                 }
 
@@ -157,12 +232,12 @@ public class BatalhaNaval {
                 String numStr = entrada.substring(1);
                 linha = Integer.parseInt(numStr) - 1;
                 if (linha < 0 || linha >= TAMANHO) {
-                    System.out.println("⚠ Linha inválida. Use números de 1 a 10.");
+                    System.out.println("Linha inválida. Use números de 1 a 10.");
                     continue;
                 }
 
                 if (visivel[linha][coluna] == TIRO || visivel[linha][coluna] == ERRO) {
-                    System.out.println(" Posição já atingida!");
+                    System.out.println("Posição já atingida!");
                 } else {
                     valido = true;
                 }
@@ -172,17 +247,19 @@ public class BatalhaNaval {
         }
 
         if (inimigo[linha][coluna] == NAVIO) {
-            System.out.println(" " + jogador + " acertou um navio!");
+            System.out.println(jogador + " acertou um navio!");
             inimigo[linha][coluna] = TIRO;
             visivel[linha][coluna] = TIRO;
+            return true;
         } else {
-            System.out.println(" " + jogador + " errou.");
+            System.out.println(jogador + " errou.");
             inimigo[linha][coluna] = ERRO;
             visivel[linha][coluna] = ERRO;
+            return false;
         }
     }
 
-    static void turnoComputador(char[][] jogador, char[][] visivel) {
+    static boolean turnoComputador(char[][] jogador, char[][] visivel) {
         int linha, coluna;
         boolean valido = false;
 
@@ -198,17 +275,19 @@ public class BatalhaNaval {
             int linhaHumana = linha + 1;
 
             if (jogador[linha][coluna] == NAVIO) {
-                System.out.println(" O computador acertou em " + letraColuna + linhaHumana);
+                System.out.println("O computador acertou em " + letraColuna + linhaHumana);
                 jogador[linha][coluna] = TIRO;
                 visivel[linha][coluna] = TIRO;
+                return true;
             } else {
-                System.out.println(" O computador errou em " + letraColuna + linhaHumana);
+                System.out.println("O computador errou em " + letraColuna + linhaHumana);
                 jogador[linha][coluna] = ERRO;
                 visivel[linha][coluna] = ERRO;
             }
 
             valido = true;
         }
+        return false;
     }
 
     static boolean verificarFim(char[][] tab) {
